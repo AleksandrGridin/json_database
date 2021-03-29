@@ -1,42 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="JsonDatabaseTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2021-03-28T12:31:22" hostname="MacBook-Pro.local" time="0.069">
+<testsuite name="JsonDatabaseTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2021-03-29T17:39:54" hostname="MacBook-Pro.local" time="0.595">
   <properties/>
-  <testcase name="start" classname="JsonDatabaseTest" time="0.069"/>
+  <testcase name="start" classname="JsonDatabaseTest" time="0.595"/>
   <system-out><![CDATA[?[1;31m
 Start test 1?[0m
-Here
-> exit
-?[1;31m
-Start test 2?[0m
-> get 1
-ERROR
-> set 1 Hello world!
-OK
-> set 1 HelloWorld!
-OK
-> get 1
-HelloWorld!
-> delete 1
-OK
-> delete 1
-OK
-> get 1
-ERROR
-> set 55 Some text here
-OK
-> get 55
-Some text here
-> get 56
-ERROR
-> delete 55
-OK
-> delete 56
-OK
-> delete 100
-OK
-> delete 101
-ERROR
-> exit
+Server started!
+Client started!
+Received: Give me a record # 12
+Sent: Give me a record # 12
+Sent: A record # 12 was sent!
+Received: A record # 12 was sent!
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
