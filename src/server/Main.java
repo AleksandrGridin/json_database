@@ -5,7 +5,6 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
-import java.util.Scanner;
 
 public class Main {
     private static String[] dataBase = new String[100];
@@ -17,72 +16,74 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
+
         System.out.println("Server started!");
 
         try (ServerSocket serverSocket = new ServerSocket(PORT, 50,
                 InetAddress.getByName(ADDRESS))) {
 
+            while (true) {
+                try (Socket socket = serverSocket.accept();
+                     DataInputStream dataIn = new DataInputStream(socket.getInputStream());
+                     DataOutputStream dataOut = new DataOutputStream(socket.getOutputStream())) {
 
-                    try (Socket socket = serverSocket.accept();
-                         DataInputStream dataIn = new DataInputStream(socket.getInputStream());
-                         DataOutputStream dataOut = new DataOutputStream(socket.getOutputStream());
-                         Scanner sc = new Scanner(System.in);) {
+                    String[] msgFromClient = dataIn.readUTF().split(" ");
 
-
-                        int n = 12;
-                        System.out.print("Received: Give me a record # " + n + "\n");
-                        dataOut.writeUTF(String.valueOf(n));
-                        String number = dataIn.readUTF();
-                        System.out.println("Sent: A record # " + number + " was sent!");
-
+                    if (msgFromClient[1].equals("exit")) {
+                        break;
                     }
 
+                    switch (msgFromClient[1]) {
+                        case "set":
+                            set(dataOut, msgFromClient);
+                            break;
+                        case "get":
+                            get(dataOut, msgFromClient[3]);
+                            break;
+                        case "delete":
+                            delete(dataOut, msgFromClient);
+                            break;
+                    }
                 }
+            }
         }
+    }
 
+    private static void delete(DataOutputStream dataOut, String[] msgFromClient) throws IOException {
+        try {
+            dataBase[Integer.parseInt(msgFromClient[3]) - 1] = "";
+            dataOut.writeUTF("OK");
+        } catch (IndexOutOfBoundsException e) {
+            dataOut.writeUTF("ERROR");
+        }
+    }
 
+    private static void get(DataOutputStream dataOut, String s) throws IOException {
+        try {
+            String dataFromBase = dataBase[Integer.parseInt(s) - 1];
+            if (dataFromBase.equals("")) {
+                dataOut.writeUTF("ERROR");
+            } else {
+                dataOut.writeUTF(dataFromBase);
+            }
+        } catch (IndexOutOfBoundsException e) {
+            dataOut.writeUTF("ERROR");
+        }
+    }
 
+    private static void set(DataOutputStream dataOut, String[] msgFromClient) throws IOException {
+        try {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 2; i < msgFromClient.length; i++) {
+                sb.append(msgFromClient[i]).append(" ");
+            }
+            dataBase[Integer.parseInt(msgFromClient[3]) - 1] = sb.toString().trim();
+            dataOut.writeUTF("OK");
 
-//        BufferedReader scanner = new BufferedReader(new InputStreamReader(System.in));
-//        String line = null;
-//
-//        while (!(line = scanner.readLine()).equals("exit")) {
-//
-//            String[] mass = line.split(" ");
-//
-//            if (mass[0].equals("set")) {
-//                try {
-//                    StringBuilder sb = new StringBuilder();
-//                    for (int i = 2; i < mass.length; i++) {
-//                        sb.append(mass[i] + " ");
-//                    }
-//                    dataBase[Integer.parseInt(mass[1]) - 1] = sb.toString().trim();
-//                    System.out.println("OK");
-//                } catch (IndexOutOfBoundsException e) {
-//                    System.out.println("ERROR");
-//                }
-//            } else if (mass[0].equals("get")) {
-//                try {
-//                String get = dataBase[Integer.parseInt(mass[1]) - 1];
-//                if (get.equals("")) {
-//                    System.out.println("ERROR");
-//                } else {
-//                    System.out.println(get);
-//                }
-//                } catch (IndexOutOfBoundsException e) {
-//                    System.out.println("ERROR");
-//                }
-//            } else if (mass[0].equals("delete")) {
-//                try {
-//                    dataBase[Integer.parseInt(mass[1]) - 1] = "";
-//                    System.out.println("OK");
-//                } catch (IndexOutOfBoundsException e) {
-//                    System.out.println("ERROR");
-//                }
-//            } else {
-//                break;
-//            }
-//        }
+        } catch (IndexOutOfBoundsException e) {
+            dataOut.writeUTF("ERROR");
+        }
+    }
 
 
     private static void initDataBase() {
