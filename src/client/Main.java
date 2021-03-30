@@ -19,17 +19,21 @@ public class Main {
                  DataOutputStream dataOut = new DataOutputStream(socket.getOutputStream())
             ) {
 
-                String msg = dataIn.readUTF();
-                System.out.println("Sent: Give me a record # " + msg);
-                dataOut.writeUTF(msg);
-                System.out.println("Received: A record # " + msg + " was sent!");
+                StringBuilder sb = new StringBuilder();
 
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
+                for (String str : args) {
+                    sb.append(str).append(" ");
+                }
+
+                dataOut.writeUTF(sb.toString().trim());
+                System.out.println("Sent: " + sb.toString().replaceAll("-[a-z] ", "").trim());
+
+                System.out.println("Received: " + dataIn.readUTF());
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+    }
     }
 
 
